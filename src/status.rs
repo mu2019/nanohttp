@@ -15,7 +15,7 @@ impl Status {
     /// Get the numeric representation of the status code.
     fn code(&self) -> u16 {
         match self {
-            Status::SwitchingProtocols => 101
+            Status::SwitchingProtocols => 101,
             Status::Ok => 200,
             Status::SeeOther => 303,
             Status::BadRequest => 400,
