@@ -1,5 +1,6 @@
 #[derive(Debug, PartialEq, Clone)]
 pub enum Status {
+    SwitchingProtocols,
     Ok,
     SeeOther,
     NotFound,
@@ -14,6 +15,7 @@ impl Status {
     /// Get the numeric representation of the status code.
     fn code(&self) -> u16 {
         match self {
+            Status::SwitchingProtocols => 101
             Status::Ok => 200,
             Status::SeeOther => 303,
             Status::BadRequest => 400,
@@ -28,6 +30,7 @@ impl Status {
     fn message(&self) -> &str {
         // Get the status message.
         match self {
+            Status::SwitchingProtocols => "SWITCHING PROTOCOLS",
             Status::Ok => "OK",
             Status::SeeOther => "SEE OTHER",
             Status::BadRequest => "BAD REQUEST",
