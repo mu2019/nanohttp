@@ -1,15 +1,15 @@
 #[derive(Debug, PartialEq, Clone)]
 pub struct Header {
-    key: String,
-    value: String,
+    pub key: String,
+    pub value: String,
 }
 
 impl Header {
     /// Create a new http header from a key-value pair.
     pub fn new(key: &str, value: &str) -> Self {
         Header {
-            key: key.to_string(),
-            value: value.to_string(),
+           key: key.to_string(),
+           value: value.to_string(),
         }
     }
 }
