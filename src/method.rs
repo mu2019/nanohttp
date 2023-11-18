@@ -28,6 +28,20 @@ impl Method {
     }
 }
 
+impl ToString for Method {
+    
+    fn to_string(&self) -> String {
+        match self {
+            Self::HEAD => "HEAD",
+            Self::GET => "GET",
+            Self::POST => "POST",
+            Self::PUT => "PUT",
+            Self::DELETE => "DELETE"
+        }.to_string()
+    }
+    
+}
+
 #[cfg(test)]
 mod tests {
     use crate::Method;
