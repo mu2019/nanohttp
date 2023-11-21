@@ -95,7 +95,27 @@ impl Request {
     pub fn from_string(buffer: &str) -> Result<Self, Error> {
         Self::parse(buffer)
     }
-
+    
+    pub fn to_string(&self) -> String {
+        let mut buf = String::new();
+        buf.push_str(&self.method.to_string());
+        buf.push_str(" ");
+        buf.push_str(&self.path.uri);
+        buf.push_str("?");
+        let qrs: Vec<String> = self.path.query.iter().map(|q| format!("{}={}", q.key, q.value)).collect();
+        buf.push_str(&qrs.join("&"));
+        buf.push_str(" HTTP/");
+        buf.push_str(&self.version);
+        buf.push_str("\r\n");
+        let hds: Vec<String> = self.headers.iter().map(|h| h.to_string()).collect();
+        buf.push_str(&hds.join("\r\n"));
+        if buf.contains("Content-Length") {
+            buf.push_str("\r\n\r\n");
+            buf.push_str(&self.body);
+        }
+        buf
+    }
+    
     fn parse(buffer: &str) -> Result<Request, Error> {
         let parser_err = Error {
             err_type: ErrorType::ParserError,
