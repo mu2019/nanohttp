@@ -74,6 +74,94 @@ impl Response {
 
         Response { headers, ..self }
     }
+
+    fn parse_protocol(line: &str) -> Result<(&str, &str), Error> {
+        let parser_err = Error {
+            err_type: ErrorType::ParserError,
+            msg: "Invalid protocol format".to_string(),
+        };
+
+        let mut parts = line.split("/");
+
+        let scheme = match parts.next() {
+            Some(scheme) => scheme,
+            None => return Err(parser_err),
+        };
+
+        let version = match parts.next() {
+            Some(version) => version,
+            None => return Err(parser_err),
+        };
+
+        Ok((scheme, version))
+    }    
+
+    fn parse_header(line: &str) -> Result<Header, Error> {
+        let parser_err = Error {
+            err_type: ErrorType::ParserError,
+            msg: "Invalid header format".to_string(),
+        };
+
+        let mut parts = line.split(": ");
+
+        let key = match parts.next() {
+            Some(key) => key,
+            None => return Err(parser_err),
+        };
+
+        let value = match parts.next() {
+            Some(value) => value,
+            None => return Err(parser_err),
+        };
+
+        Ok(Header::new(key, value))
+    }
+
+    pub fn parse(buffer: &str) -> Result<Response, Error> {
+        let parser_err = Error {
+            err_type: ErrorType::ParserError,
+            msg: "Invalid response format".to_string(),
+        };
+        let mut body_parts = buffer.split("\r\n\r\n");
+        let hpart = match body_parts.next() {
+            Some(hpart) => hpart,
+            None => return Err(parser_err),
+        };
+        let body = body_parts.next().unwrap_or("").to_string();
+
+        let mut parts = hpart.split("\r\n");
+
+        let start_line = match parts.next() {
+            Some(start_line) => start_line,
+            None => return Err(parser_err),
+        };
+
+        let mut line_parts = start_line.split(" ");
+
+        let protocol = match line_parts.next() {
+            Some(protocol) => protocol,
+            None => return Err(parser_err),
+        };
+
+        let (scheme, version) = Self::parse_protocol(protocol)?;
+        let status_code = match line_parts.next() {
+            Some(code) => code,
+            None => return Err(parser_err),
+        };
+        let status = match Status::from_str(status_code) {
+            Ok(status) => status,
+            _ => return Err(parser_err),
+        };
+
+        let headers: Vec<Header> = parts.into_iter().flat_map(|h| Self::parse_header(h)).collect();
+        Ok(Response {
+            scheme: scheme.to_string(),
+            version: version.to_string(),
+            status: Status::Ok,
+            headers,
+            content: body,
+        })
+    }    
 }
 
 impl ToString for Response {
