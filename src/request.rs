@@ -202,7 +202,7 @@ impl Request {
 
 impl ToString for Request {
     /// Convert the `Request` to a valid http plaintext request
-    pub fn to_string(&self) -> String {
+    fn to_string(&self) -> String {
         let mut buf = String::new();
         buf.push_str(&self.method.to_string());
         buf.push_str(" ");
