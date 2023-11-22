@@ -50,6 +50,29 @@ impl ToString for Status {
     }
 }
 
+impl FromStr for Status {
+    type Err = Error;
+
+    fn from_str(code: &str) -> Result<Self, Self::Err> {
+        let parser_err = Error {
+            err_type: ErrorType::ParserError,
+            msg: "Invalid status format".to_string(),
+        };
+        match code {
+            "101" => Ok(Self::SwitchingProtocols),
+            "200" => Ok(Self::Ok),
+            "303" => Ok(Self::SeeOther),
+            "400" => Ok(Self::BadRequest),
+            "401" => Ok(Self::Unauthorized),
+            "403" => Ok(Self::Forbidden),
+            "404" => Ok(Self::NotFound),
+            "405" => Ok(Self::NotAllowed),
+            "500" => Ok(Self::InternalServerError),
+            _ => Err(parser_err)
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::Status;
